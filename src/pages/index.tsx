@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Button } from "@/components/ui/button";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,6 +21,7 @@ export default function Home() {
         <h1 className="text-4xl font-bold">
           Welcome to the Bodhi Browser Demo
         </h1>
+        <Button>Click me</Button>
       </div>
     </div>
   );
