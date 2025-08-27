@@ -4,9 +4,9 @@ import {
   APP_CLIENT_ID,
   AUTH_REALM,
   BODHI_AUTH_URL,
-  STORAGE_KEYS,
-  getRedirectUri,
   getHomeUrl,
+  getRedirectUri,
+  STORAGE_KEYS,
 } from "@/lib/extension-constants";
 import { storeLandingError } from "@/lib/landing-error-storage";
 
@@ -127,6 +127,23 @@ export function useAuthServer(): UseAuthServerReturn {
     [],
   );
 
+  const clearTokensAndRedirect = useCallback(() => {
+    console.log("🔄 Clearing tokens and redirecting to landing page");
+
+    // Clear all auth-related storage
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.RESOURCE_SCOPE);
+    localStorage.removeItem(STORAGE_KEYS.CODE_VERIFIER);
+    localStorage.removeItem(STORAGE_KEYS.STATE);
+
+    // Emit custom event to notify auth state change immediately (same tab)
+    window.dispatchEvent(new CustomEvent("authStateChanged"));
+
+    // Navigate to landing page (clear query params and force refresh)
+    window.location.href = getHomeUrl();
+  }, []);
+
   const refreshAccessToken = useCallback(async (): Promise<string | null> => {
     // Prevent multiple concurrent refresh attempts
     if (refreshPromiseRef.current) {
@@ -233,24 +250,7 @@ export function useAuthServer(): UseAuthServerReturn {
     } finally {
       refreshPromiseRef.current = null;
     }
-  }, []);
-
-  const clearTokensAndRedirect = useCallback(() => {
-    console.log("🔄 Clearing tokens and redirecting to landing page");
-
-    // Clear all auth-related storage
-    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.RESOURCE_SCOPE);
-    localStorage.removeItem(STORAGE_KEYS.CODE_VERIFIER);
-    localStorage.removeItem(STORAGE_KEYS.STATE);
-
-    // Emit custom event to notify auth state change immediately (same tab)
-    window.dispatchEvent(new CustomEvent("authStateChanged"));
-
-    // Navigate to landing page (clear query params and force refresh)
-    window.location.href = getHomeUrl();
-  }, []);
+  }, [clearTokensAndRedirect]);
 
   const buildAuthHeaders = useCallback(
     (additionalHeaders?: Record<string, string>): Record<string, string> => {

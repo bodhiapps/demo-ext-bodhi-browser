@@ -2,8 +2,8 @@ import {
   APP_CLIENT_ID,
   AUTH_REALM,
   BODHI_AUTH_URL,
-  STORAGE_KEYS,
   getRedirectUri,
+  STORAGE_KEYS,
 } from "./extension-constants";
 
 // PKCE utility functions
@@ -98,7 +98,7 @@ export async function buildAuthUrl(): Promise<string> {
   });
 
   const authUrl = `${BODHI_AUTH_URL}/realms/${AUTH_REALM}/protocol/openid-connect/auth?${params}`;
-  console.log("🌐 Authorization URL built:", authUrl.substring(0, 100) + "...");
+  console.log("🌐 Authorization URL built:", `${authUrl.substring(0, 100)}...`);
 
   return authUrl;
 }

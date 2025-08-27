@@ -1,5 +1,5 @@
 import { ArrowRight, CheckCircle, Loader2, XCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +13,6 @@ import { StatusDisplay } from "@/components/ui/status-display";
 import { useAuthServer } from "@/hooks/useAuthServer";
 import { useExtensionApi } from "@/hooks/useExtensionApi";
 import { getHomeUrl } from "@/lib/extension-constants";
-
 import { useExtensionContext } from "./ExtensionProvider";
 
 type ProcessingState =
@@ -52,19 +51,22 @@ export function CallbackHandler() {
   const [state, setState] = useState<ProcessingState>({ status: "loading" });
   const [steps, setSteps] = useState<CallbackStep[]>(defaultSteps);
 
-  const updateStepStatus = (stepId: string, status: CallbackStep["status"]) => {
-    setSteps((prev) =>
-      prev.map((step) => (step.id === stepId ? { ...step, status } : step)),
-    );
-  };
+  const updateStepStatus = useCallback(
+    (stepId: string, status: CallbackStep["status"]) => {
+      setSteps((prev) =>
+        prev.map((step) => (step.id === stepId ? { ...step, status } : step)),
+      );
+    },
+    [],
+  );
 
-  const setStepError = () => {
+  const setStepError = useCallback(() => {
     setSteps((prev) =>
       prev.map((step) =>
         step.status === "active" ? { ...step, status: "error" } : step,
       ),
     );
-  };
+  }, []);
 
   // Self-contained atomic processing - follows reference implementation pattern
   useEffect(() => {
@@ -175,7 +177,13 @@ export function CallbackHandler() {
       console.log("🧹 [CallbackHandler] Cleanup: preventing duplicate calls");
       mounted = false;
     };
-  }, [extension.client, authServer, extensionApi]); // Only stable dependencies
+  }, [
+    extension.client,
+    authServer,
+    extensionApi,
+    updateStepStatus,
+    setStepError,
+  ]); // Only stable dependencies
 
   const handleRetry = () => {
     console.log("🔄 [CallbackHandler] User requested retry - reloading page");

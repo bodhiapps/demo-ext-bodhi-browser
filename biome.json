@@ -21,6 +21,12 @@
       "suspicious": {
         "noUnknownAtRules": "off",
         "noExplicitAny": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
+      },
+      "complexity": {
+        "noStaticOnlyClass": "off"
       }
     },
     "domains": {

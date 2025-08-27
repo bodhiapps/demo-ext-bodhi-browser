@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { AuthCard } from "@/components/extension/AuthCard";
@@ -7,8 +8,10 @@ import { ExtensionStatus } from "@/components/extension/ExtensionStatus";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { getLandingError } from "@/lib/landing-error-storage";
+import { ROUTES } from "@/lib/routes";
 
 function AppContent() {
+  const router = useRouter();
   const { extension, auth } = useExtensionContext();
   const [landingError, setLandingError] = useState<string | null>(null);
 
@@ -61,12 +64,23 @@ function AppContent() {
           <AuthCard />
         </div>
 
-        {/* Note */}
+        {/* Chat Page Link */}
         <div className="mt-12 text-center">
-          <p className="text-sm text-gray-500">
+          <Button
+            onClick={() => {
+              if (extension.client && auth.isAuthenticated) {
+                router.push(ROUTES.CHAT);
+              }
+            }}
+            disabled={!extension.client || !auth.isAuthenticated}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+          >
+            Try Chat Interface
+          </Button>
+          <p className="mt-2 text-sm text-gray-500">
             {extension.client && auth.isAuthenticated
-              ? "You are successfully connected to the Bodhi extension and authenticated!"
-              : "Connect the extension and authenticate to access AI capabilities"}
+              ? "Experience our AI chat interface"
+              : "You need to be logged in to use the chat"}
           </p>
         </div>
       </div>

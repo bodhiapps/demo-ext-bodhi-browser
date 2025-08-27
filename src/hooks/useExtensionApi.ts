@@ -67,7 +67,7 @@ export function useExtensionApi(
         return true;
 
       // Error message containing 401
-      if (error.message && error.message.includes("401")) return true;
+      if (error.message?.includes("401")) return true;
     }
 
     return false;
